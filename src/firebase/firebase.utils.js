@@ -12,6 +12,31 @@ const config =  {
     measurementId: "G-W181DPY6CC"
 };
 
+export const createUserProfileDocument = async (userAuth, additionalData) => { //async since its an api req, userAuth is the user obj 
+    if (!userAuth) return;//null i.e. when signs out
+
+    const userRef = firestore.doc(`users/${userAuth.uid}`)//we are querying the doc i.e. document reference in users collection
+    const snapShot = await userRef.get(); //using get we get document snapshot i.e. if such data exists 
+
+    if(!snapShot.exists) { //if snapshot doesnt exist i.e. no data in that place we create a new data
+       const { displayName, email } = userAuth;
+       const createdAt = new Date();
+       
+       try {
+        await userRef.set({  //create new object if doesn't exist already
+            displayName,
+            email,
+            createdAt,
+            ...additionalData
+        }) 
+       } catch(error) {
+        console.log('error creating user', error.message);
+       }
+    }
+
+    return userRef;
+};
+
 firebase.initializeApp(config);
 
 export const auth = firebase.auth(); //this method from firebase/auth
