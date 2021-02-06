@@ -4,7 +4,7 @@ import FormInput from '../form-input/form-input.component';
 import CustomButton from '../custom-button/custom-button.component';
 //custom button has children so can have closing tag
 
-import { signInWithGoogle } from '../../firebase/firebase.utils';
+import { auth, signInWithGoogle } from '../../firebase/firebase.utils';
 
 import './sign-in.styles.scss';
 
@@ -18,11 +18,19 @@ class SignIn extends React.Component {  //class component cz we have to store wh
         }
     }
 
-    handleSubmit = event => {
+    handleSubmit = async event => {
         event.preventDefault(); //prevents default submit action from firing
 
-        this.setState({ email: '', password: '' })
-    }
+        const { email, password } = this.state;
+
+        try {
+            await auth.signInWithEmailAndPassword(email, password);
+            this.setState({ email: '', password: '' })
+        } catch (error) {
+            console.error(error);
+        }
+
+    };
 
     handleChange = event => {
         const {value, name} = event.target;
