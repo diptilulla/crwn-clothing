@@ -13,17 +13,18 @@ const config =  {
 };
 
 export const createUserProfileDocument = async (userAuth, additionalData) => { //async since its an api req, userAuth is the user obj 
-    if (!userAuth) return;//null i.e. when signs out
+    if (!userAuth) return;//null i.e. when signs out exit from func
 
-    const userRef = firestore.doc(`users/${userAuth.uid}`)//we are querying the doc i.e. document reference in users collection
+    const userRef = firestore.doc(`users/${userAuth.uid}`)//we are querying the doc i.e. document reference in users collection to check if current user exists in db
     const snapShot = await userRef.get(); //using get we get document snapshot i.e. if such data exists 
-
+    
+    //query ref obj is obj that represents current place in db that we are querying firebase always returns obj even if data doesnt exist
     if(!snapShot.exists) { //if snapshot doesnt exist i.e. no data in that place we create a new data
        const { displayName, email } = userAuth;
        const createdAt = new Date();
        
        try {
-        await userRef.set({  //create new object if doesn't exist already
+        await userRef.set({  //create new object in that place if doesn't exist already to store data of new user.
             displayName,
             email,
             createdAt,

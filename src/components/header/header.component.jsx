@@ -42,3 +42,4 @@ const mapStateToProps = state => ({ //we want rootreducer as state and return an
 })
 
 export default connect(mapStateToProps)(Header); //getting access to state to be specific getting access to currentUser
+//connect has to be passed 2 arguments oout of which 2nd is optional 1st is mapStateToProps which allows us to access state, here state=rooot reducer
