@@ -45,11 +45,13 @@ class App extends React.Component {
   }
   
   render() {
-    return (
+    return ( 
       <div>
         <Header /> 
         <Switch>
+        {/* switch when sees urs that matches path it doesn't render anything after it so if do't use exact with '/' then also /shop will not render homepage because switch matched '/' first and will not render anything else */}
           <Route exact path='/' component={HomePage} /> 
+          {/* if this is not exact & we don't use switch then /shop will also render homepage since there is '/' in it, so we need exact '/' */}
           <Route path='/shop' component={ShopPage} /> 
           <Route 
             exact 
@@ -75,7 +77,8 @@ const mapStateToProps = ({ user }) => ({  //destructing user from state
 
 const mapDispatchToProps = dispatch => ({ //to dispatch new action we return an object with prop name will be whatever prop we want to pass that dispatches the new action we want to pass
   setCurrentUser: user => dispatch(setCurrentUser(user))  //setCurrentUser goes to a function which gets user obejct then calls dispatch, which is a way for redux to know that whatever obj is passed inside it is an action obj passed to all reducers
-  //this invokes the setCurrentUser action with user which will be used as payload
+  //this invokes the setCurrentUser action with user which will be used as payload in the action and this will return an object which is going to be dispatched 
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(App); //app doesnt need currentuser value sine it only sets currentUser but doesn't use it anywhere inside it apart from sending it to header so instead of mapstatetoprops we have null 
+ 
