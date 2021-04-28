@@ -5,11 +5,11 @@ import SHOP_DATA from './shop.data'
 import CollectionPreview from '../../components/collection-preview/collection-preview.component'
 
 class ShopPage extends React.Component {
-    constructor(props) {
-        super(props);
+    constructor() {
+        super();
 
         this.state = {
-            collections: SHOP_DATA
+            collections: SHOP_DATA //its a class componet because we want to store data
         }
     }
 
