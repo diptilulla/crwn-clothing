@@ -1,16 +1,22 @@
 import React from 'react';
 import { Route, Switch , Redirect} from 'react-router-dom';
 import { connect } from 'react-redux';
+import { createStructuredSelector } from "reselect";
 
 import './App.css';
 
 import HomePage from './pages/homepage/homepage.component'
 import ShopPage from './pages/shop/shop.component';
 import SignInAndSignUp from './pages/sign-in-and-sign-up/sign-in-and-sign-up.component';
+import CheckoutPage from "./pages/checkout/checkout.component";
+
 import Header from './components/header/header.component';
 //we place header outside switch and route because we want it to be rendered despite whatever switch and route decides to render on dom
+
 import { auth, createUserProfileDocument  } from './firebase/firebase.utils';
+
 import { setCurrentUser } from './redux/user/user.actions';
+import { selectCurrentUser } from "./redux/user/user.selectors";
 
 class App extends React.Component {
   
@@ -45,35 +51,33 @@ class App extends React.Component {
   }
   
   render() {
-    return ( 
+    return (
       <div>
-        <Header /> 
+        <Header />
         <Switch>
-        {/* switch when sees urs that matches path it doesn't render anything after it so if do't use exact with '/' then also /shop will not render homepage because switch matched '/' first and will not render anything else */}
-          <Route exact path='/' component={HomePage} /> 
+          {/* switch when sees urs that matches path it doesn't render anything after it so if do't use exact with '/' then also /shop will not render homepage because switch matched '/' first and will not render anything else */}
+          <Route exact path="/" component={HomePage} />
           {/* if this is not exact & we don't use switch then /shop will also render homepage since there is '/' in it, so we need exact '/' */}
-          <Route path='/shop' component={ShopPage} /> 
-          <Route 
-            exact 
-            path='/signin' 
-            render = {() =>           
-              this.props.currentUser ? (
-                <Redirect to='/' />
-              ) : (
-                <SignInAndSignUp />
-              )
+          <Route path="/shop" component={ShopPage} /> 
+          {/* this is not exact bcz we'll add categories eventually like shop/hats */}
+          <Route exact path="/checkout" component={CheckoutPage} />
+          <Route
+            exact
+            path="/signin"
+            render={() =>
+              this.props.currentUser ? <Redirect to="/" /> : <SignInAndSignUp />
             }
-          />  
-            {/* render is same as render function we use determines what component to return */}
+          />
+          {/* render is same as render function we use determines what component to return */}
         </Switch>
-      </div> 
+      </div>
     );
   }
 }
 
-const mapStateToProps = ({ user }) => ({  //destructing user from state
-  currentUser: user.currentUser
-})
+const mapStateToProps = createStructuredSelector({
+  currentUser: selectCurrentUser,
+});
 
 const mapDispatchToProps = dispatch => ({ //to dispatch new action we return an object with prop name will be whatever prop we want to pass that dispatches the new action we want to pass
   setCurrentUser: user => dispatch(setCurrentUser(user))  //setCurrentUser goes to a function which gets user obejct then calls dispatch, which is a way for redux to know that whatever obj is passed inside it is an action obj passed to all reducers

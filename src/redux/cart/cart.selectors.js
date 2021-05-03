@@ -3,6 +3,11 @@ import { createSelector } from "reselect"; //to cache and now we an reuse this s
 //input selector - func which takes whole state and just returns a lice of it - 1 layer deep usually
 const selectCart = (state) => state.cart; //we want cart reducer out of root reducer/state
 
+export const selectCartHidden = createSelector(
+  [selectCart],
+  (cart) => cart.hidden
+);
+
 export const selectCartItems = createSelector(
   //memoized selector
   [selectCart], //1st arg-array of input selector
@@ -17,4 +22,12 @@ export const selectCartItemsCount = createSelector(
         accumulatedQuantity + cartItem.quantity,
       0
     )
+);
+
+export const selectCartTotal = createSelector([selectCartItems], (cartItems) =>
+  cartItems.reduce(
+    (accumulatedQuantity, cartItem) =>
+      accumulatedQuantity + cartItem.quantity * cartItem.price,
+    0
+  )
 );
