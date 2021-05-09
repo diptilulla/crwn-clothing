@@ -18,7 +18,7 @@ export const selectCartItemsCount = createSelector(
   [selectCartItems], //can also take other selector apart from i/p selector
   (cartItems) =>
     cartItems.reduce(
-      (accumulatedQuantity, cartItem) =>
+      (accumulatedQuantity, cartItem)   =>
         accumulatedQuantity + cartItem.quantity,
       0
     )
