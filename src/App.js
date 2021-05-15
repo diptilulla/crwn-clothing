@@ -13,10 +13,15 @@ import CheckoutPage from "./pages/checkout/checkout.component";
 import Header from './components/header/header.component';
 //we place header outside switch and route because we want it to be rendered despite whatever switch and route decides to render on dom
 
-import { auth, createUserProfileDocument  } from './firebase/firebase.utils';
+import {
+  auth,
+  createUserProfileDocument,
+  // addCollectionAndDocuments,
+} from "./firebase/firebase.utils";
 
 import { setCurrentUser } from './redux/user/user.actions';
 import { selectCurrentUser } from "./redux/user/user.selectors";
+// import { selectCollectionsForPreview } from "./redux/shop/shop.selectors";
 
 class App extends React.Component {
   
@@ -24,30 +29,34 @@ class App extends React.Component {
 
   componentDidMount() {
     const { setCurrentUser } = this.props;
+    // const { setCurrentUser, collectionsArray } = this.props;
 
-    // we open a connection(subscription) between firebase and our app and this sens us the current auth state
+    // we open a connection(subscription to observable of auth data-stream) between firebase and our app and this sens us the current auth state when we instantiate listener
     this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => { //auth status changed i.e. when changes occur on firebase user signs in signs out etc parameter is user state of the auth on firebase proj
+      //auth.onAuthStateChange is observable of stream of events or data stream in auth lib, userAuth is the observer next call
       console.log(userAuth);
 
       if (userAuth) {//null if signing out
         const userRef = await createUserProfileDocument(userAuth); //we return userRef in createUserProfileDocument funct
-        userRef.onSnapshot(snapShot => {  //we get the 1st state of the newdata we stored in userRef or already stored data in that uid, has uid
-          setCurrentUser({        //setting payload of setCurrentUser action and in turn user reducer value with new obj when user snapShot changes
-              id: snapShot.id,
-              ...snapShot.data()        //to get actual data as json object displayname email stored but without uid so need to store seperately in state of app snapShot has uid
-            });
+        userRef.onSnapshot((snapShot) => {
+          //we get the 1st state of the newdata we stored in userRef or already stored data in that uid, has uid, onSnapdhot is a listener like onAuthStateChanged which is fired when document snapshot object changes(on set, update or deleting a value)
+          setCurrentUser({
+            //setting payload of setCurrentUser action and in turn user reducer value with new obj when user snapShot changes
+            id: snapShot.id,
+            ...snapShot.data(), //to get actual data as json object displayname email stored but without uid so need to store seperately in state of app snapShot has uid
           });
+        });
       }
-      else {
+      
         setCurrentUser(userAuth); //setting user to null when user sign out
-      }
-    });
+        // addCollectionAndDocuments('collections',collectionsArray.map(({title, items}) => ({ title, items }))) //destructring off of obj and returning new array with objs with just title and items
+    }, error => console.log(error)); //error call of Observer
   }
 
   //on calling onAuthStateChanged it gives us back a function which we store in unsubscribefromauth which when called closes the subscription
   componentWillUnmount(){
     //here we close the subcription or connection between
-    this.unsubscribeFromAuth() //close subscription
+    this.unsubscribeFromAuth() //close subscription, we need to stop listening of auth, get rid of listener
   }
   
   render() {
@@ -77,6 +86,7 @@ class App extends React.Component {
 
 const mapStateToProps = createStructuredSelector({
   currentUser: selectCurrentUser,
+  // collectionsArray: selectCollectionsForPreview,
 });
 
 const mapDispatchToProps = dispatch => ({ //to dispatch new action we return an object with prop name will be whatever prop we want to pass that dispatches the new action we want to pass

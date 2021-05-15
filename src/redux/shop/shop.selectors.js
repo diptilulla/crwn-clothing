@@ -18,7 +18,8 @@ export const selectCollections = createSelector(
 
 export const selectCollectionsForPreview = createSelector(
   [selectCollections],
-  (collections) => Object.keys(collections).map((key) => collections[key])
+  (collections) =>
+    collections ? Object.keys(collections).map((key) => collections[key]) : []
 ); //getting collection keys, mapping and returning the value, gives an array of items, converting collections back to state from object so as to use it for mapping
 
 export const selectCollection = (collectionUrlParam) =>
@@ -28,5 +29,5 @@ export const selectCollection = (collectionUrlParam) =>
     //   collections.find(
     //     (collection) => collection.id === COLLECTION_ID_MAP[collectionUrlParam]
     //   ) //getting value of prop = collectionUrlParam from COLECTION_ID_MAP
-    (collections) => collections[collectionUrlParam] //state normalization array -> object to avoid using find which may take large time in worst case
+    (collections) => (collections ? collections[collectionUrlParam] : null) //state normalization array -> object to avoid using find which may take large time in worst case
   );

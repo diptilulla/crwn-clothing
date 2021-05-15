@@ -12,6 +12,8 @@ const config = {
   measurementId: "G-W181DPY6CC",
 };
 
+firebase.initializeApp(config);
+
 export const createUserProfileDocument = async (userAuth, additionalData) => {
   //async since its an api req, userAuth is the user obj
   if (!userAuth) return; //null i.e. when signs out exit from func
@@ -41,7 +43,40 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
   return userRef;
 };
 
-firebase.initializeApp(config);
+export const addCollectionAndDocuments = async (
+  collectionKey,
+  objectsToAdd
+) => {
+  const collectionRef = firestore.collection(collectionKey);
+
+  const batch = firestore.batch();
+  objectsToAdd.forEach((obj) => {
+    const newDocRef = collectionRef.doc(); //get document at empty string, firebase gives new document reference in this collection, & randomly generate an id (unique key)
+    batch.set(newDocRef, obj); //we'll loop through the array and batch these calls of setting value of newDocRef with objs in array
+  });
+
+  return await batch.commit(); //fires off our batch call/request, this returns a promise, when commit succeds it'll come back and resolve a void(null) value
+};
+//we can make one set call at a time, we can't set an array in as collection documents, but each call is individual they fire one at a time, its possible for the code to stop mid-way dure to tech issues and only some of the documents are stored in the firebase, this makes code predictable, so to make code consistent, we make batch write, grping all calls together into 1 big req which fails of is successful
+
+export const convertCollectionsSnapshotToMap = (collections) => {
+  const transformedCollection = collections.docs.map((docSnapshot) => {
+    const { title, items } = docSnapshot.data();
+
+    return {
+      //we are returning an object
+      routeName: encodeURI(title.toLowerCase()), //encodeURI will get some string and return a string where any char that url cannot handle(space and some symbols) or process it'll convert them into verion that url can actually need
+      id: docSnapshot.id,
+      title,
+      items,
+    };
+  });
+
+  return transformedCollection.reduce((accumulator, collection) => {
+    accumulator[collection.title.toLowerCase()] = collection; //accumulator obj up until the iteration and we set title as prop and set its value eq to collection
+    return accumulator; //goes to next iteration of reduce, finally we'll a single object with title of all 5 collection obj are keys and they are eq to collection objects
+  }, {}); //initial value of accumulator is an empty obj
+};
 
 export const auth = firebase.auth(); //this method from firebase/auth
 export const firestore = firebase.firestore();

@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { connect } from 'react-redux'; //connect is a higher order comp that lets us modify our comp to have access things related to redux
 import { createStructuredSelector } from "reselect";
 
@@ -11,38 +10,42 @@ import { selectCurrentUser } from "../../redux/user/user.selectors";
 
 import { ReactComponent as Logo } from '../../assets/crown.svg';  //special syntax for importng svg
 
-import './header.styles.scss';
+import {
+  HeaderContainer,
+  LogoContainer,
+  OptionLink,
+  OptionsContainer,
+} from "./header.styles";
 
 const Header = ({ currentUser, hidden }) => (
-    <div className='header'>
-        <Link to='/'>
-            <Logo className='logo' />
-        </Link>
-        <div className='options'>
-            <Link className='option' to='/shop'>
-                SHOP
-            </Link>
-            <Link className='option' to='/shop'>
-                CONTACT
-            </Link>
-            {
-                currentUser ? (
-                <div className='option' onClick={() => auth.signOut()}>
-                  SIGN OUT
-                </div>
-                ) : (             //when null
-                <Link className='option' to='/signin'>
-                  SIGN IN
-                </Link>
-                )
-            }
-            <CartIcon />
-        </div>
-        {
-            hidden ? null :
-            <CartDropdown />
-        }
-    </div>
+  <HeaderContainer>
+    <LogoContainer to="/">
+      <Logo className="logo" />
+    </LogoContainer>
+    <OptionsContainer>
+      <OptionLink to="/shop">
+        SHOP
+      </OptionLink>
+      <OptionLink to="/shop">
+        CONTACT
+      </OptionLink>
+      {currentUser ? (
+        <OptionLink as='div' onClick={() => auth.signOut()}>
+          SIGN OUT
+        </OptionLink> ) //we can change the element type we can also pass custom components like OptionLink as={CartIcon}
+        /* <OptionDiv onClick={() => auth.signOut()}>
+          SIGN OUT
+        </OptionDiv> */
+       : (
+        //when null
+        <OptionLink to="/signin">
+          SIGN IN
+        </OptionLink>
+      )}
+      <CartIcon />
+    </OptionsContainer>
+    {hidden ? null : <CartDropdown />}
+  </HeaderContainer>
 );
 
 //function that allows us to access the state (root-reducer )
