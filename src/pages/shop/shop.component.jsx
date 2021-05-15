@@ -29,9 +29,9 @@ class ShopPage extends React.Component {
     const { updateCollections } = this.props;
     const collectionRef = firestore.collection("collections"); //we want to fetch shop data in shop component as both its children collections overview and collections page need it
     
-    fetch('https://firestore.googleapis.com/v1/projects/crwn-db-c5780/databases/(default)/documents/collections')
-     .then(response => response.json())
-     .then(collections => console.log(collections))
+    // fetch('https://firestore.googleapis.com/v1/projects/crwn-db-c5780/databases/(default)/documents/collections')
+    //  .then(response => response.json())
+    //  .then(collections => console.log(collections)) //after this we'll get an array which will have objects nested
 
     // //Observable-Observer code
     // this.unsubscribeFromSnapshot = collectionRef.onSnapshot(async (snapshot) => {
@@ -40,13 +40,14 @@ class ShopPage extends React.Component {
     //   updateCollections(collectionsMap);
     //   this.setState({ loading: false });
     // });
-    // //get code (api calls) using promise style without onSnapshot listener - but we'll only get data from this only when we are remounting the component, bcz we are not leveraging the live update stream style of Observable pattern
-    // collectionRef.get().then(
-    //   snapshot => {
-    //     const collectionsMap = convertCollectionsSnapshotToMap(snapshot);
-    //     updateCollections(collectionsMap);
-    //     this.setState({ loading: false });
-    //   }); //get makes api call to call to fetch back data associated to colectionRef i.e. snapshot object,  its a promise
+    
+    //get code (api calls) using promise style without onSnapshot listener - but we'll only get data from this only when we are remounting the component, bcz we are not leveraging the live update stream style of Observable pattern
+    collectionRef.get().then(
+      snapshot => {
+        const collectionsMap = convertCollectionsSnapshotToMap(snapshot);
+        updateCollections(collectionsMap);
+        this.setState({ loading: false });
+      }); //get makes api call to call to fetch back data associated to colectionRef i.e. snapshot object,  its a promise
 
   }
 
